@@ -71,4 +71,23 @@ public class MineFieldView extends JPanel implements MineFieldListener {
         // Force panel to repaint itself with new data.
         repaint();
     }
+    //Allows resetting the view when new model is set.
+    public void setModel(MineFieldModel newModel) { 
+        this.model = newModel; 
+        removeAll(); 
+        //Reset layout with new model dimensions.
+        setLayout(new GridLayout(model.getRows(), model.getCols())); 
+        cells = new JLabel[model.getRows()][model.getCols()]; 
+        //Reinitialize each cell label.
+        for (int r = 0; r < model.getRows(); r++) { 
+            for (int c = 0; c < model.getCols(); c++) { 
+                JLabel label = new JLabel("?", SwingConstants.CENTER); 
+                label.setBorder(BorderFactory.createLineBorder(Color.GRAY)); 
+                cells[r][c] = label; 
+                add(label); 
+            } 
+        } 
+        revalidate(); 
+        repaint(); 
+    } 
 }
