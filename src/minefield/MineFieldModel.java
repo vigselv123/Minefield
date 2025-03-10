@@ -3,13 +3,19 @@ package minefield;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.io.File;          
+import java.io.FileWriter;    
+import java.io.BufferedReader;
+import java.io.FileReader;    
+import java.io.IOException;   
+import java.io.PrintWriter;   
 
 //Model class holds state and logic of Mine Field game. Notifies listeners whenever its state changes.
 public class MineFieldModel {
     // Percentage of cells will contain mines.
     public static final int PERCENT_MINED = 5;
 
-    // Dimensions of grid 10x10).
+    // Dimensions of grid 10x10.
     private int rows;
     private int cols;
 
@@ -29,6 +35,9 @@ public class MineFieldModel {
     // List of listeners (usually views) want to be notified of changes.
     private List<MineFieldListener> listeners;
 
+    //Flag to track unsaved changes in  model
+    private boolean dirty; 
+
     //Constructor creates minefield with given number of rows and columns.
     public MineFieldModel(int rows, int cols) {
         this.rows = rows;
@@ -45,6 +54,9 @@ public class MineFieldModel {
 
         // Mark game as not over yet.
         gameOver = false;
+
+        //When starting fresh game, it's not "dirty" yet
+        dirty = false; 
 
         // Randomly place mines in grid based on PERCENT_MINED.
         Random rand = new Random();
@@ -153,6 +165,10 @@ public class MineFieldModel {
         }
 
         // If none of above conditions triggered, move is valid.
+
+        //Mark model as "dirty"; new state that hasn't been saved
+        dirty = true; 
+
         notifyListeners();
     }
 
@@ -211,4 +227,81 @@ public class MineFieldModel {
         }
         return count;
     }
+
+    //Returns true if model has unsaved changes.
+    public boolean isDirty() { 
+        return dirty;          
+    }                          
+
+    //Allows other classes to set or clear dirty flag.
+    public void setDirty(boolean d) { 
+        dirty = d;                  
+    }                               
+
+    //Save the model to a text file.
+    public void save(File file) throws IOException { 
+        try (PrintWriter pw = new PrintWriter(new FileWriter(file))) { 
+            // Write rows, cols, playerRow, playerCol, gameOver
+            pw.println(rows);     
+            pw.println(cols);     
+            pw.println(playerRow);
+            pw.println(playerCol);
+            pw.println(gameOver); 
+
+            // Save mines grid
+            for (int r = 0; r < rows; r++) {               
+                for (int c = 0; c < cols; c++) {           
+                    pw.print(mines[r][c] ? "1" : "0");     
+                }
+                pw.println();                              
+            }
+
+            // Save visited grid
+            for (int r = 0; r < rows; r++) {               
+                for (int c = 0; c < cols; c++) {           
+                    pw.print(visited[r][c] ? "1" : "0");   
+                }
+                pw.println();                              
+            }
+        }
+        // After successful save, it's no longer dirty
+        dirty = false; 
+    } 
+
+    //Load MineFieldModel from text file.
+    public static MineFieldModel load(File file) throws IOException { 
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) { 
+            int r = Integer.parseInt(br.readLine()); 
+            int c = Integer.parseInt(br.readLine()); 
+            MineFieldModel model = new MineFieldModel(r, c); 
+
+            model.playerRow = Integer.parseInt(br.readLine()); 
+            model.playerCol = Integer.parseInt(br.readLine()); 
+            model.gameOver  = Boolean.parseBoolean(br.readLine()); 
+
+            // Read mines
+            for (int rr = 0; rr < r; rr++) {                    
+                String line = br.readLine();                    
+                for (int cc = 0; cc < c; cc++) {                
+                    model.mines[rr][cc] = (line.charAt(cc) == '1'); 
+                }
+            }
+
+            // Read visited
+            for (int rr = 0; rr < r; rr++) {                    
+                String line = br.readLine();                    
+                for (int cc = 0; cc < c; cc++) {                
+                    model.visited[rr][cc] = (line.charAt(cc) == '1'); 
+                }
+            }
+
+            // After loading, it's not dirty
+            model.dirty = false; 
+
+            // Notify listeners (if any) that loaded new data
+            model.notifyListeners(); 
+
+            return model; 
+        }
+    } 
 }
