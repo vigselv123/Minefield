@@ -7,7 +7,7 @@ public class MineFieldFactory implements AppFactory {
     @Override
     public MineFieldModel makeModel() {
         // Create 10x10 minefield by default
-        return new MineFieldModel(10, 10);
+        return new MineFieldModel(20, 20);
     }
 
     @Override
