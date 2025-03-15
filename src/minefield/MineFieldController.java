@@ -1,177 +1,60 @@
 package minefield;
 
 import javax.swing.*;
-import java.io.File;
+import java.awt.*;
 
-public class MineFieldController {
+//simple controller panel that extends AppPanel.
+//It adds directional buttons to left side, and uses AppPanel's menu for File/Edit operations.
+public class MineFieldController extends AppPanel {
 
-
-    private MineFieldModel model;
-    private MineFieldView view;
-    private MineFieldFactory factory;
-    private File currentFile;
-
-
-    public MineFieldController(MineFieldModel model, MineFieldView view, MineFieldFactory factory) {
-        this.model = model;
-        this.view = view;
-        this.factory = factory;
-        this.currentFile=null;
-
-
-        //Action events for all the buttons
-        view.getButtonN().addActionListener(e -> handleMove("moveN"));
-        view.getButtonNE().addActionListener(e -> handleMove("moveNE"));
-        view.getButtonE().addActionListener(e -> handleMove("moveE"));
-        view.getButtonSE().addActionListener(e -> handleMove("moveSE"));
-        view.getButtonS().addActionListener(e -> handleMove("moveS"));
-        view.getButtonSW().addActionListener(e -> handleMove("moveSW"));
-        view.getButtonW().addActionListener(e -> handleMove("moveW"));
-        view.getButtonNW().addActionListener(e -> handleMove("moveNW"));
-
-        view.getEditN().addActionListener(e -> handleMove("moveN"));
-        view.getEditNE().addActionListener(e -> handleMove("moveNE"));
-        view.getEditE().addActionListener(e -> handleMove("moveE"));
-        view.getEditSE().addActionListener(e -> handleMove("moveSE"));
-        view.getEditS().addActionListener(e -> handleMove("moveS"));
-        view.getEditSW().addActionListener(e -> handleMove("moveSW"));
-        view.getEditW().addActionListener(e -> handleMove("moveW"));
-        view.getEditNW().addActionListener(e -> handleMove("moveNW"));
-
-        view.getMenuItemNew().addActionListener(e -> doNew());
-        view.getMenuItemOpen().addActionListener(e -> doOpen());
-        view.getMenuItemSave().addActionListener(e -> doSave());
-        view.getMenuItemQuit().addActionListener(e -> System.exit(0));
-
-        view.getAbout().addActionListener(e -> doAbout());
-        view.getHelpItm().addActionListener(e -> doHelp());
-        view.getSaveAs().addActionListener(e -> doSaveAs());
+    public MineFieldController(AppFactory factory) {
+        super(factory);
+        layoutView();
     }
 
+    //Creates panel of directional buttons on the west side and puts view in center
+    protected void layoutView() {
+        // Since the MineFieldView already creates directional buttons,
+        // we need to wire them up to our controller's actions
 
-    private void doAbout() {
-        //Get the about text
-        String aboutText = factory.about();
-        //Display text
-        JOptionPane.showMessageDialog(view, aboutText, "About", JOptionPane.INFORMATION_MESSAGE);
-    }
+        MineFieldView mineFieldView =  view;
 
-    private void doHelp() {
-        //Get the help text
-        String[] helpItems = factory.getHelp();
-        String helpText = String.join("\n", helpItems);
-        //Display the help text
-        JOptionPane.showMessageDialog(view, helpText, "Help", JOptionPane.INFORMATION_MESSAGE);
-    }
+        //Wire up directional buttons with action listeners
+        mineFieldView.getButtonNW().addActionListener(e -> edit("moveNW"));
+        mineFieldView.getButtonN().addActionListener(e -> edit("moveN"));
+        mineFieldView.getButtonNE().addActionListener(e -> edit("moveNE"));
+        mineFieldView.getButtonW().addActionListener(e -> edit("moveW"));
+        mineFieldView.getButtonE().addActionListener(e -> edit("moveE"));
+        mineFieldView.getButtonSW().addActionListener(e -> edit("moveSW"));
+        mineFieldView.getButtonS().addActionListener(e -> edit("moveS"));
+        mineFieldView.getButtonSE().addActionListener(e -> edit("moveSE"));
 
-    //Handle player movement
-    private void handleMove(String commandType) {
-        Command cmd = factory.makeEditCommand(model, commandType);
-        if (cmd != null) {
-            cmd.execute(model);
-        }
-    }
+        //Wire up menu items
+        mineFieldView.getMenuItemNew().addActionListener(e -> newFile());
+        mineFieldView.getMenuItemSave().addActionListener(e -> saveFile());
+        mineFieldView.getSaveAs().addActionListener(e -> saveFile());
+        mineFieldView.getMenuItemOpen().addActionListener(e -> openFile());
+        mineFieldView.getMenuItemQuit().addActionListener(e -> System.exit(0));
 
-
-    private void doNew() {
-        //prompt user file is unsaved
-        if (!unsaved()) {
-            return;
-        }
-
-        //close old window
-        java.awt.Window oldWindow = SwingUtilities.getWindowAncestor(view);
-        if (oldWindow != null) {
-            oldWindow.dispose();
-        }
-
-        //create new window
-        MineFieldModel model = new MineFieldModel(20,20);
-        MineFieldView view = new MineFieldView(model);
-        model.addListener(view);
-        MineFieldFactory factory = new MineFieldFactory();
-        MineFieldController controller = new MineFieldController(model, view, factory);
-
-        view.modelChanged();
+        //Wire up edit menu items
+        mineFieldView.getEditNW().addActionListener(e -> edit("moveNW"));
+        mineFieldView.getEditN().addActionListener(e -> edit("moveN"));
+        mineFieldView.getEditNE().addActionListener(e -> edit("moveNE"));
+        mineFieldView.getEditW().addActionListener(e -> edit("moveW"));
+        mineFieldView.getEditE().addActionListener(e -> edit("moveE"));
+        mineFieldView.getEditSW().addActionListener(e -> edit("moveSW"));
+        mineFieldView.getEditS().addActionListener(e -> edit("moveS"));
+        mineFieldView.getEditSE().addActionListener(e -> edit("moveSE"));
+        mineFieldView.getAbout().addActionListener(e -> about());
+        mineFieldView.getHelpItm().addActionListener(e -> help());
 
     }
 
-
-    private void doOpen() {
-        //prompt user that file is unsaved
-        if (!unsaved()) {
-            return;
+    @Override
+    public void setModel(MineFieldModel newModel) {
+        model = newModel;
+        if (view != null) {
+            ((MineFieldView)view).setModel(newModel);
         }
-        //Choose a file
-        JFileChooser chooser = new JFileChooser();
-        int result = chooser.showOpenDialog(view);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File file = chooser.getSelectedFile();
-            try {
-
-                MineFieldModel newModel = factory.open(file);
-                newModel.addListener(view);
-
-                this.model = newModel;
-
-                this.currentFile = file;
-                view.modelChanged();
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(
-                        view,
-                        "Open failed: " + ex.getMessage(),
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
-            }
-        }
-    }
-
-    private void doSaveAs() {
-        //choose where to save
-        JFileChooser chooser = new JFileChooser();
-        int result = chooser.showSaveDialog(view);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File file = chooser.getSelectedFile();
-            try {
-                factory.save(model, file);
-                model.setDirty(false);
-                currentFile = file;
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(view,
-                        "Save failed: " + ex.getMessage(),
-                        "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-
-    //save if saveAs has been run
-    private void doSave() {
-        if (currentFile == null) {
-            doSaveAs();
-        } else {
-            try {
-                factory.save(model, currentFile);
-                model.setDirty(false);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(view,
-                        "Save failed: " + ex.getMessage(),
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-
-    //if file is not saved, warn user
-    private boolean unsaved() {
-        if (model.isDirty()) {
-            int choice = JOptionPane.showConfirmDialog(view,
-                    "You have unsaved changes. Start a new game?",
-                    "Unsaved Changes", JOptionPane.YES_NO_OPTION);
-            if (choice != JOptionPane.YES_OPTION) {
-                return false;
-            }
-        }
-        return true;
     }
 }

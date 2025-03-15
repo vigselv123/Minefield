@@ -9,7 +9,8 @@ public class AppPanel extends JPanel {
     protected MineFieldModel model;        // Current model
     protected MineFieldView view;          // Current view
     protected AppFactory factory; // Factory that builds model, view, commands
-    protected JMenuBar menuBar;   // Main menu bar
+    protected JMenuBar menuBar;
+    private File currentFile;// Main menu bar
 
     public AppPanel(AppFactory factory) {
         super();
@@ -43,6 +44,10 @@ public class AppPanel extends JPanel {
         saveItem.addActionListener(e -> saveFile());
         fileMenu.add(saveItem);
 
+        JMenuItem saveAsItem = new JMenuItem("Save As");
+        saveAsItem.addActionListener(e ->saveAsFile());
+        fileMenu.add(saveAsItem);
+
         fileMenu.addSeparator();
 
         JMenuItem exitItem = new JMenuItem("Exit");
@@ -56,6 +61,16 @@ public class AppPanel extends JPanel {
         JMenuItem moveN = new JMenuItem("Move North");
         moveN.addActionListener(e -> edit("moveN"));
         editMenu.add(moveN);
+
+        JMenu helpMenu = new JMenu("Help");
+
+        JMenuItem help = new JMenuItem("Help");
+        help.addActionListener(e ->help());
+        helpMenu.add(help);
+
+        JMenuItem about = new JMenuItem("About");
+        about.addActionListener(e -> about());
+        helpMenu.add(about);
 
         JMenuItem moveNE = new JMenuItem("Move NE");
         moveNE.addActionListener(e -> edit("moveNE"));
@@ -86,8 +101,30 @@ public class AppPanel extends JPanel {
         editMenu.add(moveNW);
 
         bar.add(editMenu);
+        bar.add(helpMenu);
 
         return bar;
+    }
+
+    protected void help() {
+        String[] helpItems = factory.getHelp();
+        String helpText = String.join("\n", helpItems);
+        JOptionPane.showMessageDialog(
+                view,
+                helpText,
+                "Help",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    protected void about() {
+        String aboutText = factory.about();
+        JOptionPane.showMessageDialog(
+                view,
+                aboutText,
+                "About",
+                JOptionPane.INFORMATION_MESSAGE
+        );
     }
 
     //Called when user selects "New" from File menu.
@@ -120,19 +157,44 @@ public class AppPanel extends JPanel {
 
     //Called when user selects "Save" from File menu.
     protected void saveFile() {
-        JFileChooser chooser = new JFileChooser();
-        if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-            File file = chooser.getSelectedFile();
+
+        if (currentFile == null) {
+            saveAsFile();
+        } else {
             try {
-                ((MineFieldFactory) factory).save(model, file);
+                factory.save(model, currentFile);
+                model.setDirty(false);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this,
+                JOptionPane.showMessageDialog(
+                        view,
                         "Save failed: " + ex.getMessage(),
                         "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.ERROR_MESSAGE
+                );
             }
         }
     }
+
+    protected void saveAsFile() {
+        JFileChooser chooser = new JFileChooser();
+        int result = chooser.showSaveDialog(view);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
+            try {
+                factory.save(model, file);
+                model.setDirty(false);
+                this.currentFile = file;
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(
+                        view,
+                        "Save failed: " + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+    }
+
 
     //Called when user selects an item from Edit menu.
     protected void edit(String type) {

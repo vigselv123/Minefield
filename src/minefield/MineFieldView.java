@@ -136,14 +136,7 @@ public class MineFieldView extends JPanel implements MineFieldListener {
 
         //create and initialize frame
 
-        JFrame frame = new JFrame("Mine Field MVC");
-        frame.setJMenuBar(menuBar);
-        frame.setSize(1000, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setResizable(false);
-        frame.setLocationRelativeTo(null);
-        frame.add(this);    // 'this' is our MineFieldView panel
-        frame.setVisible(true);
+
 
 
     }

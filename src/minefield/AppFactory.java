@@ -1,4 +1,6 @@
+
 package minefield;
+import java.io.File;
 
 public interface AppFactory {
     // Create new model.
@@ -18,5 +20,7 @@ public interface AppFactory {
 
     // Create edit command based on "type" string.
     Command makeEditCommand(MineFieldModel model, String type);
+
+    void save(MineFieldModel model, File file) throws Exception;
 }
 
