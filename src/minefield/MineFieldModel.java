@@ -101,6 +101,7 @@ public class MineFieldModel {
             throw new MineFieldException("Game has ended. No more moves allowed.");
         }
 
+
         // Compute new row and column based on heading.
         int newRow = playerRow;
         int newCol = playerCol;
@@ -161,7 +162,7 @@ public class MineFieldModel {
             // Game over: player reached goal.
             gameOver = true;
             notifyListeners();
-            throw new MineFieldException("You reached the goal.");
+            throw new MineFieldException("You win! You reached the goal.");
         }
 
         // If none of above conditions triggered, move is valid.

@@ -14,6 +14,8 @@ public class MineFieldMain {
 
             //Register the view as a listener to the model.
             model.addListener(view);
+            MineFieldFactory factory = new MineFieldFactory();
+            MineFieldController controller = new MineFieldController(model, view, factory);
 
             view.modelChanged();
         });

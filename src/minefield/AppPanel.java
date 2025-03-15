@@ -185,4 +185,8 @@ public class AppPanel extends JPanel {
     public JMenuBar getMenuBar() {
         return menuBar;
     }
+
+    public MineFieldView getView() {
+        return view;
+    }
 }

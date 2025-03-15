@@ -11,13 +11,14 @@ public class MineFieldView extends JPanel implements MineFieldListener {
     private JLabel[][] cells;
     private JPanel buttons;
     private JPanel grid;
+    private JButton N, NW, NE, S, SW, SE, E, W;
+    private JMenuBar menuBar;
+    private JMenuItem newItm, save, saveAs, open, quit, about, helpItm, editN, editNW, editNE, editW, editS, editSE, editSW, editE;
+    private JMenu help, edit;
     //Sets up GUI components for displaying grid.
     public MineFieldView(MineFieldModel model) {
         this.model = model;
-        JButton N, NW, NE, S, SW, SE, E, W;
-        JMenuBar menuBar;
-        JMenuItem newItm, save, saveAs, open, quit, about, helpItm, editN, editNW, editNE, editW, editS, editSE, editSW, editE;
-        JMenu help, edit;
+
         // Set grid layout to display rows x cols labels.
         setLayout(new GridLayout(1,2));
 
@@ -134,7 +135,8 @@ public class MineFieldView extends JPanel implements MineFieldListener {
         add(grid, BorderLayout.CENTER);
 
         //create and initialize frame
-        JFrame frame = new JFrame("Mine Field Game");
+
+        JFrame frame = new JFrame("Mine Field MVC");
         frame.setJMenuBar(menuBar);
         frame.setSize(1000, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -181,6 +183,11 @@ public class MineFieldView extends JPanel implements MineFieldListener {
                     cells[r][c].setBackground(Color.DARK_GRAY);
                     cells[r][c].setText("?");
                 }
+                if (r == model.getRows() - 1 && c == model.getCols() - 1) {
+                    cells[r][c].setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
+                } else {
+                    cells[r][c].setBorder(BorderFactory.createLineBorder(Color.GRAY));
+                }
             }
         }
         // Force panel to repaint itself with new data.
@@ -204,5 +211,72 @@ public class MineFieldView extends JPanel implements MineFieldListener {
         }
         revalidate();
         repaint();
+    }
+    public JButton getButtonN() {
+        return N;
+    }
+    public JButton getButtonNW() {
+        return NW;
+    }
+    public JButton getButtonNE() {
+        return NE; }
+    public JButton getButtonW() { return W;
+    }
+    public JButton getButtonE() {
+        return E;  }
+    public JButton getButtonSW() {
+        return SW; }
+    public JButton getButtonS() {
+        return S;
+    }
+    public JButton getButtonSE() {
+        return SE;
+    }
+    public JMenuItem getEditN()  {
+        return editN;
+    }
+    public JMenuItem getEditNW() {
+        return editNW;
+    }
+    public JMenuItem getEditNE() {
+        return editNE;
+    }
+    public JMenuItem getEditW()  {
+        return editW;
+    }
+    public JMenuItem getEditE()  {
+        return editE;  }
+    public JMenuItem getEditS()  { return editS;
+    }
+    public JMenuItem getEditSW() {
+        return editSW; }
+    public JMenuItem getEditSE() { return editSE;
+    }
+    public JMenuItem getMenuItemNew()  {
+        return newItm;
+    }
+    public JMenuItem getMenuItemSave() {
+        return save;
+    }
+    public JMenuItem getMenuItemOpen() {
+        return open;
+    }
+    public JMenuItem getMenuItemQuit() {
+        return quit;
+    }
+    public JMenu getHelp() {
+        return help;
+    }
+    public JMenu getEdit() {
+        return edit;
+    }
+    public JMenuItem getHelpItm() {
+        return helpItm;
+    }
+    public JMenuItem getAbout() {
+        return about;
+    }
+    public JMenuItem getSaveAs() {
+        return saveAs;
     }
 }
