@@ -189,9 +189,12 @@ public class MineFieldView extends JPanel implements MineFieldListener {
     //Allows resetting the view when new model is set.
     public void setModel(MineFieldModel newModel) {
         this.model = newModel;
-        removeAll();
+
+        newModel.addListener(this);
+        remove(grid);
+
         //Reset layout with new model dimensions.
-        setLayout(new GridLayout(model.getRows(), model.getCols()));
+        grid = new JPanel(new GridLayout(model.getRows(), model.getCols()));
         cells = new JLabel[model.getRows()][model.getCols()];
         //Reinitialize each cell label.
         for (int r = 0; r < model.getRows(); r++) {
@@ -199,11 +202,13 @@ public class MineFieldView extends JPanel implements MineFieldListener {
                 JLabel label = new JLabel("?", SwingConstants.CENTER);
                 label.setBorder(BorderFactory.createLineBorder(Color.GRAY));
                 cells[r][c] = label;
-                add(label);
+                grid.add(label);
             }
         }
+        add(grid, BorderLayout.CENTER);
         revalidate();
         repaint();
+        modelChanged();
     }
     public JButton getButtonN() {
         return N;
