@@ -1,7 +1,12 @@
+
+//By Vignesh Selvaraj and Bhagatjeet Dhillon
+//Group 11
+//March 20, 2025
+
 package minefield;
 
 import javax.swing.*;
-import java.awt.*;
+
 
 public class MineFieldMain {
     public static void main(String[] args) {

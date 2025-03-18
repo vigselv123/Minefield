@@ -31,7 +31,7 @@ public class MineFieldFactory implements AppFactory {
 
     @Override
     public String about() {
-        return "Mine Field game using an MVC pattern.";
+        return "Mine Field game using an MVC pattern by Bhagatjeet Dhillon and Vignesh Selvaraj";
     }
 
     //Create commands for Edit menu, based on string "type".
